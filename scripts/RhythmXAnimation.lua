@@ -1,5 +1,4 @@
--- RhythmXAnimation.lua
--- Fallen: Kanlı Katliam | Tenacity: Frisk'in Merhameti | Megalo: Deli Oklar | Petals: Mavi Akıllı/Sevimli Aura
+-- RhythmXAnimation.lua (Megalo Strike Back Theme Edition)
 
 local toggleDir = 1
 local isAnimationsActive = false
@@ -8,8 +7,16 @@ local notifTimer = 0
 local notifDuration = 2.5
 local notifBaseX = 950
 local notifHiddenX = 1350
-local notifY = 660 -- AutoPress ile üst üste binmemesi için Y konumu biraz aşağıda
+local notifY = 660
 local slideSpeed = 8
+
+-- Metin Kutusu Değişkenleri (Daktilo Efekti İçin)
+local dialogueActive = false
+local dialogueText = ""
+local fullDialogueText = ""
+local charIndex = 1
+local textTimer = 0
+local textSpeed = 0.03
 
 function onCreate()
     -- ==================== BİLDİRİM METNİ ====================
@@ -25,22 +32,28 @@ function onCreate()
     setObjectCamera("animNotif", "other")
     addLuaText("animNotif")
 
-    -- ==================== FALLEN İÇİN GÖRSELLER ====================
-    makeLuaSprite('jumpscareChara', 'chara_scary', 0, 0)
-    setLuaSpriteScrollFactor('jumpscareChara', 0, 0)
-    screenCenter('jumpscareChara')
-    setProperty('jumpscareChara.alpha', 0)
-    addLuaSprite('jumpscareChara', true)
+    -- ==================== UNDERTALE DİYALOG KUTUSU (ÜST KISIM) ====================
+    makeLuaSprite('boxBorder', '', 134, 60)
+    makeGraphic('boxBorder', 1012, 172, '0xFFFFFFFF')
+    setObjectCamera('boxBorder', 'other')
+    setProperty('boxBorder.alpha', 0)
+    addLuaSprite('boxBorder', true)
 
-    makeLuaSprite('scaryMessage', 'chara_scary_message', 0, 0)
-    setGraphicSize('scaryMessage', 600, 300)
-    updateHitbox('scaryMessage')
-    setProperty('scaryMessage.x', 80)  
-    setProperty('scaryMessage.y', 180) 
-    setProperty('scaryMessage.alpha', 0)
-    setObjectCamera('scaryMessage', 'hud') 
-    addLuaSprite('scaryMessage', true)
+    makeLuaSprite('boxInner', '', 138, 64)
+    makeGraphic('boxInner', 1004, 164, '0xFF000000')
+    setObjectCamera('boxInner', 'other')
+    setProperty('boxInner.alpha', 0)
+    addLuaSprite('boxInner', true)
 
+    makeLuaText('boxText', '', 960, 154, 78)
+    setTextSize('boxText', 26)
+    setTextFont('boxText', 'vcr.ttf')
+    setTextColor('boxText', 'FF1133')
+    setObjectCamera('boxText', 'other')
+    setProperty('boxText.alpha', 0)
+    addLuaText('boxText')
+
+    -- ==================== FALLEN İÇİN METİN & ANİMASYON ====================
     makeLuaText('creepySmile', '=)', 600)
     setTextSize('creepySmile', 72)
     setTextColor('creepySmile', 'FF0000')
@@ -49,16 +62,6 @@ function onCreate()
     setObjectCamera('creepySmile', 'hud')
     setProperty('creepySmile.alpha', 0)
     addLuaText('creepySmile')
-
-    -- ==================== TENACITY İÇİN GÖRSEL ====================
-    makeLuaSprite('friskMessage', 'friskMessage', 0, 0)
-    setGraphicSize('friskMessage', 600, 300)
-    updateHitbox('friskMessage')
-    setProperty('friskMessage.x', 320)  
-    setProperty('friskMessage.y', 230) 
-    setProperty('friskMessage.alpha', 0)
-    setObjectCamera('friskMessage', 'hud') 
-    addLuaSprite('friskMessage', true)
 end
 
 local function showNotif(text, color)
@@ -70,19 +73,65 @@ local function showNotif(text, color)
     notifTimer = notifDuration
 end
 
+local function triggerDialogue(text, textColorHex)
+    fullDialogueText = text
+    dialogueText = ""
+    charIndex = 1
+    dialogueActive = true
+    
+    if textColorHex ~= nil then
+        setTextColor('boxText', textColorHex)
+    end
+    
+    setProperty('boxBorder.y', 50)
+    setProperty('boxInner.y', 54)
+    setProperty('boxText.y', 68)
+    
+    setProperty('boxBorder.alpha', 0)
+    setProperty('boxInner.alpha', 0)
+    setProperty('boxText.alpha', 0)
+    
+    doTweenAlpha('showBoxBorder', 'boxBorder', 1, 0.4, 'quadOut')
+    doTweenAlpha('showBoxInner', 'boxInner', 1, 0.4, 'quadOut')
+    doTweenAlpha('showBoxText', 'boxText', 1, 0.4, 'quadOut')
+    
+    doTweenY('moveBoxBorder', 'boxBorder', 60, 0.4, 'quadOut')
+    doTweenY('moveBoxInner', 'boxInner', 64, 0.4, 'quadOut')
+    doTweenY('moveBoxText', 'boxText', 78, 0.4, 'quadOut')
+    
+    triggerEvent("Screen Shake", "0.2, 0.005", "")
+    runTimer('hideDialogueTimer', 4.0)
+end
+
 function onSongStart()
     local songName = string.lower(getProperty("songName") or "")
+    
     if string.find(songName, "fallen") then
-        doTweenAlpha('showMessage', 'scaryMessage', 1, 0.5, 'expoOut')
-        runTimer('hideMessageTimer', 2.5)
+        triggerDialogue("* Fightin' a demon... fills you with determination. =)", "FF1133")
     elseif string.find(songName, "tenacity") then
-        doTweenAlpha('showFriskMsg', 'friskMessage', 1, 0.8, 'sineOut')
-        runTimer('hideFriskMessageTimer', 3.0)
+        triggerDialogue("* The wind is howling... yet your soul resonates with peace, while at the same time, you are afraid.", "FFAA00")
+    elseif string.find(songName, "megalo") or string.find(songName, "strike") then
+        triggerDialogue("* Human... CVS (Chara's Vengeance Strike) is about to begin.", "FF5500")
+    else
+        triggerDialogue("* Let the rhythm guide your soul through the underground.", "CCCCCC")
     end
 end
 
 function onUpdatePost(elapsed)
-    -- CTRL Tuşu ile animasyonları aç/kapat
+    if dialogueActive then
+        textTimer = textTimer + elapsed
+        if textTimer >= textSpeed then
+            textTimer = 0
+            if charIndex <= string.len(fullDialogueText) then
+                dialogueText = dialogueText .. string.sub(fullDialogueText, charIndex, charIndex)
+                setTextString('boxText', dialogueText)
+                charIndex = charIndex + 1
+            else
+                dialogueActive = false
+            end
+        end
+    end
+
     if keyboardJustPressed('CONTROL') then
         isAnimationsActive = not isAnimationsActive
         
@@ -100,7 +149,6 @@ function onUpdatePost(elapsed)
         end
     end
 
-    -- Bildirim kaydırma animasyonu
     if notifTimer > 0 then
         notifTimer = notifTimer - elapsed
         local curX = getProperty("animNotif.x")
@@ -120,10 +168,10 @@ function onUpdatePost(elapsed)
 end
 
 function onTimerCompleted(tag, loops, loopsLeft)
-    if tag == 'hideMessageTimer' then
-        doTweenAlpha('hideMessage', 'scaryMessage', 0, 1.0, 'sineIn')
-    elseif tag == 'hideFriskMessageTimer' then
-        doTweenAlpha('hideFriskMsg', 'friskMessage', 0, 1.5, 'sineIn')
+    if tag == 'hideDialogueTimer' then
+        doTweenAlpha('hideBoxBorder', 'boxBorder', 0, 0.5, 'sineIn')
+        doTweenAlpha('hideBoxInner', 'boxInner', 0, 0.5, 'sineIn')
+        doTweenAlpha('hideBoxText', 'boxText', 0, 0.5, 'sineIn')
     elseif string.find(tag, 'arrowShow_') then
          local arrowIdx = tonumber(string.sub(tag, 11))
          setPropertyFromGroup('playerStrums', arrowIdx, 'alpha', 1)
@@ -135,7 +183,6 @@ function onBeatHit()
 
     local songName = string.lower(getProperty("songName") or "")
 
-    -- ==================== FALLEN ====================
     if string.find(songName, "fallen") then
         if math.random(1, 100) <= 30 then
             local randomX = math.random(100, 1000)
@@ -149,13 +196,10 @@ function onBeatHit()
         end
 
         if curBeat % 32 == 0 then
-            setProperty('jumpscareChara.alpha', 1.0)
             cameraFlash("game", "0xFFFF0000", 0.2, true)
             triggerEvent("Screen Shake", "0.1, 0.008", "")
-            doTweenAlpha('hideJumpscare', 'jumpscareChara', 0, 0.5, 'expoIn')
         end
 
-    -- ==================== TENACITY ====================
     elseif string.find(songName, "tenacity") then
         if curBeat % 2 == 0 then
             doTweenZoom("camHUDZoom", "camHUD", 1.02, 0.1, "sineOut")
@@ -176,10 +220,9 @@ function onBeatHit()
             end
         end
 
-    -- ==================== MEGALO STRIKE BACK ====================
     elseif string.find(songName, "megalo") or string.find(songName, "strike") then
         if curBeat % 1 == 0 then
-            triggerEvent("Screen Shake", "0.05, 0.004", "")
+            triggerEvent("Screen Shake", "0.06, 0.005", "")
             local flipChance = math.random(1, 4)
             if flipChance == 1 then
                 doTweenAngle("camGameFlip", "camGame", 360, 0.15, "elasticOut")
@@ -193,8 +236,8 @@ function onBeatHit()
             for i = 0, 3 do
                 local currentAngle = getPropertyFromGroup('playerStrums', i, 'angle')
                 doTweenAngle('megaloWildSpin_' .. i, 'playerStrums.members['..i..']', currentAngle + (180 * toggleDir), 0.1, "expoOut")
-                local wildColors = {'FF0000', 'FF00FF', '00FFFF', 'FFFF00'}
-                doTweenColor('megaloColor_' .. i, 'playerStrums.members['..i..']', wildColors[math.random(1, #wildColors)], 0.08, 'linear')
+                local strikeColors = {'FF4400', 'FFD700', 'FF0000', 'FFAA00'}
+                doTweenColor('megaloColor_' .. i, 'playerStrums.members['..i..']', strikeColors[math.random(1, #strikeColors)], 0.08, 'linear')
             end
         end
 
@@ -205,7 +248,6 @@ function onBeatHit()
             end
         end
 
-    -- ==================== PETALS ====================
     elseif string.find(songName, "petals") then
         if curBeat % 2 == 0 then
             doTweenZoom("camHUDZoom", "camHUD", 1.025, 0.15, "sineInOut")
@@ -229,7 +271,6 @@ function onBeatHit()
             end
         end
 
-    -- ==================== DİĞER ŞARKILAR ====================
     else
         if curBeat % 2 == 0 then
             triggerEvent("Add Camera Zoom", "0.005", "0.005")
@@ -271,7 +312,6 @@ function onBeatHit()
         end
     end
 
-    -- ==================== FALLEN İÇİN EK EFEKTLER ====================
     if string.find(songName, "fallen") then
         if curBeat % 2 == 0 then
             triggerEvent("Screen Shake", "0.03, 0.003", "")
@@ -305,9 +345,5 @@ function onTweenCompleted(tag)
         doTweenAngle("camGameReset", "camGame", 0, 0.5, "backOut")
     elseif tag == "camHUDFlip" then
         doTweenAngle("camHUDReset", "camHUD", 0, 0.5, "backOut")
-    elseif tag == "hideMessage" then
-        setProperty('scaryMessage.alpha', 0)
-    elseif tag == "hideFriskMsg" then
-        setProperty('friskMessage.alpha', 0)
     end
 end

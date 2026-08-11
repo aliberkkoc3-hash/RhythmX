@@ -1,0 +1,3 @@
+Value1 = undefined
+Value2 = undefined
+Çünkü tetikleyici
