@@ -1,0 +1,2 @@
+Value 1 = Flash Süresi (Örn: 0.5)
+Value 2 = Kararma Süresi (Örn: 1.5)

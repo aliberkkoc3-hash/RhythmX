@@ -1,0 +1,8 @@
+{
+  "name": "RhythmX",
+  "description": "RHYTHMX",
+  "author": "Ali Berk",
+  "version": "0.0.1",
+  "restart": false,
+  "runsGlobally": true
+}
