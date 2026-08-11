@@ -51,25 +51,25 @@ function onCreate()
     setProperty('defenseText.alpha', 0)
     addLuaText('defenseText')
 
-    -- ==================== SAĞ ALT KÖŞE (UNDERTALE TARZI) UYARI METİNLERİ ====================
+    -- ==================== ORTA ALT KÖŞE (İŞARETLİ ALAN) UYARI METİNLERİ ====================
     -- SaveChart İçin (Sarı)
-    makeLuaText('savedText', '', 500, 750, 670)
-    setTextSize('savedText', 24)
+    makeLuaText('savedText', '', 340, 470, 560)
+    setTextSize('savedText', 18)
     setTextFont('savedText', 'vcr.ttf')
     setTextColor('savedText', 'FFFF00')
     setTextBorder('savedText', 2, '333300')
-    setTextAlignment('savedText', 'right')
+    setTextAlignment('savedText', 'center')
     setObjectCamera('savedText', 'other')
     setProperty('savedText.alpha', 0)
     addLuaText('savedText')
 
     -- ReplayChart İçin (Kırmızı)
-    makeLuaText('loadedText', '', 500, 750, 670)
-    setTextSize('loadedText', 24)
+    makeLuaText('loadedText', '', 340, 470, 560)
+    setTextSize('loadedText', 18)
     setTextFont('loadedText', 'vcr.ttf')
     setTextColor('loadedText', 'FF0000')
     setTextBorder('loadedText', 2, '330000')
-    setTextAlignment('loadedText', 'right')
+    setTextAlignment('loadedText', 'center')
     setObjectCamera('loadedText', 'other')
     setProperty('loadedText.alpha', 0)
     addLuaText('loadedText')
@@ -78,7 +78,6 @@ end
 local function triggerDialogue(text, textColorHex)
     if not isEventsActive then return end
 
-    -- Yeni diyalog açılmadan önce kırık parçaları temizle
     if isBroken then
         removeLuaSprite('leftHalfBorder', true)
         removeLuaSprite('rightHalfBorder', true)
@@ -121,12 +120,10 @@ local function triggerShatterAnimation()
     dialogueActive = false
     cancelTimer('hideDialogueTimer')
 
-    -- Ana kutuyu ve yazıyı gizle
     setProperty('boxBorder.alpha', 0)
     setProperty('boxInner.alpha', 0)
     setProperty('boxText.alpha', 0)
 
-    -- Sol ve Sağ Parçaları Oluştur (Border - Beyaz Dış Çerçeve)
     makeLuaSprite('leftHalfBorder', '', 134, 60)
     makeGraphic('leftHalfBorder', 506, 172, '0xFFFFFFFF')
     setObjectCamera('leftHalfBorder', 'other')
@@ -137,7 +134,6 @@ local function triggerShatterAnimation()
     setObjectCamera('rightHalfBorder', 'other')
     addLuaSprite('rightHalfBorder', true)
 
-    -- Sol ve Sağ Parçaları Oluştur (Inner - Siyah İç Alan)
     makeLuaSprite('leftHalfInner', '', 138, 64)
     makeGraphic('leftHalfInner', 502, 164, '0xFF000000')
     setObjectCamera('leftHalfInner', 'other')
@@ -150,11 +146,9 @@ local function triggerShatterAnimation()
 
     isBroken = true
 
-    -- Şiddetli ekran sarsıntısı ve patlama sesi
     triggerEvent("Screen Shake", "0.6, 0.025", "")
     playSound('cancelMenu', 1.0)
 
-    -- Sol parça sola savrulsun ve aşağı düşsün
     doTweenX('leftBorderX', 'leftHalfBorder', 20, 0.6, 'sineIn')
     doTweenY('leftBorderY', 'leftHalfBorder', 750, 0.6, 'quadIn')
     doTweenAngle('leftBorderAngle', 'leftHalfBorder', -45, 0.6, 'sineIn')
@@ -165,7 +159,6 @@ local function triggerShatterAnimation()
     doTweenAngle('leftInnerAngle', 'leftHalfInner', -45, 0.6, 'sineIn')
     doTweenAlpha('leftInnerAlpha', 'leftHalfInner', 0, 0.6, 'linear')
 
-    -- Sağ parça sağa savrulsun ve aşağı düşsün
     doTweenX('rightBorderX', 'rightHalfBorder', 1100, 0.6, 'sineIn')
     doTweenY('rightBorderY', 'rightHalfBorder', 750, 0.6, 'quadIn')
     doTweenAngle('rightBorderAngle', 'rightHalfBorder', 45, 0.6, 'sineIn')
@@ -178,7 +171,6 @@ local function triggerShatterAnimation()
 end
 
 function onUpdatePost(elapsed)
-    -- ALT Tuşu ile Event Sistemini Açma / Kapama (Toggle)
     if keyboardJustPressed('ALT') then
         isEventsActive = not isEventsActive
         
@@ -250,18 +242,18 @@ function onEvent(name, value1, value2)
         runTimer('shatterDelay', 2.2)
 
     elseif name == "SaveGChart" then
-        setTextString('savedText', "File 1 successfully saved.\n* Your determination echoes.")
+        setTextString('savedText', "File 1 saved.\n* Determination echoes.")
         setProperty('savedText.alpha', 1)
         playSound('confirmMenu', 0.5)
         doTweenAlpha('hideSaved', 'savedText', 0, 2.0, 'cubeIn')
 
     elseif name == "ReplayGChart" then
-        setTextString('loadedText', "File 1 loaded...\n* The timeline restarts.")
+        setTextString('loadedText', "File 1 loaded...\n* Timeline restarts.")
         setProperty('loadedText.alpha', 1)
         playSound('cancelMenu', 0.5)
         doTweenAlpha('hideLoaded', 'loadedText', 0, 2.0, 'cubeIn')
 
-    elseif name == "Spare" then
+   elseif name == "Spare" then
         if isBroken then
             removeLuaSprite('leftHalfBorder', true)
             removeLuaSprite('rightHalfBorder', true)
