@@ -1,13 +1,13 @@
-Psych's mods/ folder.
+# RhythmX 🎤⚡
 
-If you're a beginner, we recommend you extract modTemplate.zip to get started on developing your mod.
-Read the Psych GitHub wiki here:
-https://github.com/ShadowMario/FNF-PsychEngine/wiki
-Read the Lua Script API here:
-https://shadowmario.github.io/psychengine.lua/
+A custom Friday Night Funkin' mod built for smooth gameplay, custom mechanics, and a sleek aesthetic experience.
 
-You can also add or edit specific files without the mod template, you just have to re-create the path to said file.
+## Features 🚀
+* Custom engine configuration and optimization.
+* Tailored gameplay mechanics with lightweight Lua scripting.
+* Designed with a clean and immersive aesthetic.
 
-ABOUT EDITING:
-If you want to change something, for example, within assets/shared/images or assets/base_game/images,
-said edited files *must* be put in mods/images, the engine will handle the rest.
+## Installation 📦
+1. Download the latest release from the [Releases](https://github.com/YOUR_USERNAME/RhythmX/releases) page.
+2. Extract the archive into your Psych Engine directory.
+3. Launch the game and enjoy!
