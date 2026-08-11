@@ -184,10 +184,8 @@ function onUpdatePost(elapsed)
         
         if isEventsActive then
             playSound('confirmMenu', 0.4)
-            debugPrint("EVENT CONTROLLER: ON")
         else
             playSound('cancelMenu', 0.4)
-            debugPrint("EVENT CONTROLLER: OFF")
             
             dialogueActive = false
             cancelTimer('hideDialogueTimer')
@@ -252,14 +250,12 @@ function onEvent(name, value1, value2)
         runTimer('shatterDelay', 2.2)
 
     elseif name == "SaveGChart" then
-        debugPrint("EventController: SaveGChart yakalandı!")
         setTextString('savedText', "File 1 successfully saved.\n* Your determination echoes.")
         setProperty('savedText.alpha', 1)
         playSound('confirmMenu', 0.5)
         doTweenAlpha('hideSaved', 'savedText', 0, 2.0, 'cubeIn')
 
     elseif name == "ReplayGChart" then
-        debugPrint("EventController: ReplayGChart yakalandı!")
         setTextString('loadedText', "File 1 loaded...\n* The timeline restarts.")
         setProperty('loadedText.alpha', 1)
         playSound('cancelMenu', 0.5)

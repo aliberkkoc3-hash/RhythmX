@@ -1,25 +1,29 @@
 -- ModController.lua
 
 function onCreate()
-    -- VSCHARA modunun klasör varlığını veya dosya yolunu kontrol ediyoruz
-    -- Psych Engine'de mods klasörünün altında ilgili klasörün olup olmadığını kontrol edebiliriz
+    -- Checking the folder existence or file path of the VSCHARA mod
     local modFolderName = "VSCHARA"
     
-    -- checkModExist fonksiyonu veya standart dosya/klasör kontrolü
-    -- Psych Engine Lua ortamında mods klasörünü kontrol etmek için checkFolder veya debugPrint kullanabiliriz
-    if not checkModExist(modFolderName) then
-        debugPrint("UYARI: " .. modFolderName + " modu bulunamadı! Lütfen mod dosyalarının tam olduğundan emin olun.")
-        -- İstersen ekrana da yazdırabilirsin:
-        -- addTextToHud veya benzeri bir metotla oyuncuyu uyarabilirsin.
+    if checkModExist(modFolderName) then
+        debugPrint("[RHYTHMX/MODCONTROLLER] VSCHARA MOD EXISTS.")
     else
-        debugPrint("Başarılı: " .. modFolderName + " modu algılandı!")
+        debugPrint("[RHYTHMX/MODCONTROLLER] VSCHARA MOD NOT FOUND.")
     end
 end
 
 function checkModExist(folderName)
-    -- Psych Engine sürümüne göre dizin kontrolü
-    local path = "mods/" .. folderName
-    -- Dosya/Klasör var mı diye basit bir kontrol simülasyonu
-    -- Alternatif olarak global değişkenler veya directory kontrolü yapılabilir
-    return sys and sys.FileSystem.exists(path) or true 
+    -- Checking file or folder existence via pack.json or main directory
+    local file = io.open("mods/" .. folderName .. "/pack.json", "r")
+    if file ~= nil then
+        io.close(file)
+        return true
+    end
+    
+    local dirCheck = io.open("mods/" .. folderName, "r")
+    if dirCheck ~= nil then
+        io.close(dirCheck)
+        return true
+    end
+
+    return false
 end
