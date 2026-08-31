@@ -7,15 +7,16 @@ local songStopped = false
 local rainbowTimer = 0
 local rainbowSpeed = 2.5
 
+-- MİZAHI BOL TÜRKÇE HATA MESAJLARI
 local errorLines = {
-    "[FATAL] Version mismatch detected!",
-    "[INFO]  Required: Psych Engine 0.7.3 or 1.0.4",
-    "[INFO]  Detected: Psych Engine " .. (engineVersion ~= "" and engineVersion or "UNKNOWN"),
-    "[WARN]  RhythmX module failed to initialize",
-    "[ERROR] Incompatible engine build -- aborting launch",
-    "[HINT]  Install Psych Engine 0.7.3 or 1.0.4 to continue",
+    "[KRİTİK] Versiyonlar kapışıyor, senin PC kaybetti!",
+    "[BİLGİ] Bize Psych Engine 0.7.3 veya 1.0.4 lazım.",
+    "[BİLGİ] Senin kullandığın: Psych Engine " .. (engineVersion ~= "" and engineVersion or "BELİRSİZ"),
+    "[UYARI] RHYTHMX modülü error verdi, motor su kaynatıyor.",
+    "[HATA] Uyumsuz motor! Uçuş iptal, herkes evine dağılsın.",
+    "[İPUCU] 0.7.3 veya 1.0.4 yükle gel, çay koyduk bekliyoruz.",
     "",
-    ">> Press SHIFT to dismiss this message <<"
+    ">> SHIFT'e bas da bu rezaleti kapatalım <<"
 }
 
 local function hsvToRgb(h, s, v)
@@ -98,7 +99,7 @@ local function showFakeErrorBox()
     addLuaSprite("errBackdrop", true)
     setCam("errBackdrop", "camOther")
 
-    local boxW, boxH = 720, 340
+    local boxW, boxH = 750, 340 -- Biraz genişlettim Türkçe metinler sığsın diye
     local boxX = (sw - boxW) / 2
     local boxY = (sh - boxH) / 2
 
@@ -113,7 +114,7 @@ local function showFakeErrorBox()
     addLuaSprite("errBorder", true)
     setCam("errBorder", "camOther")
 
-    makeLuaText("errTitle", "=== SUPERBOTPLAY FATAL ERROR ===", boxW - 20, boxX + 10, boxY + 10)
+    makeLuaText("errTitle", "=== RHYTHMX: SİSTEM ÇÖKTÜ ABİ ===", boxW - 20, boxX + 10, boxY + 10)
     setTextSize("errTitle", 22)
     setTextFont("errTitle", "vcr.ttf")
     setTextColor("errTitle", "FF0000")
@@ -133,16 +134,13 @@ local function showFakeErrorBox()
     end
 end
 
--- CRITICAL: onCreate runs BEFORE the song starts loading
 function onCreate()
     if versionOK then return end
-    -- Stop song BEFORE it even starts
     stopSong()
 end
 
 function onCreatePost()
     if versionOK then return end
-    -- Double-kill in case onCreate missed it
     stopSong()
     showFakeErrorBox()
 end
@@ -150,16 +148,13 @@ end
 function onUpdate(elapsed)
     if versionOK then return end
 
-    -- Persistent audio kill every single frame
     if not songStopped then
         stopSong()
     end
     
-    -- Keep volumes at 0 even after "stopped" flag
     setProperty("inst.volume", 0)
     setProperty("vocals.volume", 0)
     
-    -- Also try to stop music object directly every frame
     runHaxeCode([[
         try {
             if (FlxG.sound.music != null && FlxG.sound.music.playing) {
@@ -200,24 +195,20 @@ function onUpdate(elapsed)
     end
 end
 
--- Extra safety: also run in onUpdatePost
 function onUpdatePost(elapsed)
     if versionOK then return end
     if not songStopped then
         stopSong()
     end
-    -- Keep killing audio
     setProperty("inst.volume", 0)
     setProperty("vocals.volume", 0)
 end
 
--- Kill audio on song start too
 function onSongStart()
     if versionOK then return end
     stopSong()
 end
 
--- Kill audio on beat hit
 function onBeatHit()
     if versionOK then return end
     stopSong()
